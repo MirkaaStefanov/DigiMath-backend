@@ -46,10 +46,6 @@ public class SecurityConfiguration {
                 .and()
                 .authorizeHttpRequests()
 
-                .requestMatchers("/game/players").authenticated()
-                .requestMatchers("/game/**").authenticated()
-                .requestMatchers("/mafiaPlayer/**").authenticated()
-
 
                 .anyRequest()
                 .permitAll()

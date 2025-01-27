@@ -40,10 +40,9 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping
-    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO user, @RequestHeader("Authorization") String auth) {
-        UserDTO createdUser = userService.createUser(user);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    @PostMapping("/register")
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO user) {
+        return ResponseEntity.ok(userService.createUser(user));
     }
 
     @PutMapping("/authenticated/{id}")

@@ -3,6 +3,7 @@ package com.example.DigiMath_backend.services;
 import com.example.DigiMath_backend.dtos.UserDTO;
 import com.example.DigiMath_backend.dtos.auth.AuthenticationResponse;
 import com.example.DigiMath_backend.dtos.auth.PublicUserDTO;
+import com.example.DigiMath_backend.enums.Role;
 import com.example.DigiMath_backend.enums.TokenType;
 import com.example.DigiMath_backend.exeptions.UserNotFoundException;
 import com.example.DigiMath_backend.models.User;
@@ -49,9 +50,6 @@ public class UserService {
     private void userValidations(UserDTO user) {
         if (StringUtils.isBlank(user.getUsername())) {
             throw new ValidationException("Username is required");
-        }
-        if (StringUtils.isBlank(user.getAddress())) {
-            throw new ValidationException("Address is required");
         }
         if (StringUtils.isBlank(user.getFirstname())) {
             throw new ValidationException("First Name is required");
@@ -107,13 +105,14 @@ public class UserService {
     }
 
     public UserDTO createUser(UserDTO user) {
-        userValidations(user);
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
+
         User user1 = modelMapper.map(user, User.class);
         user1.setPassword(encodedPassword);
         user1.setUsernameField(user.getUsername());
-
+        user1.setRole(Role.USER);
+        userValidations(user);
         userRepository.save(user1);
         return modelMapper.map(user1, UserDTO.class);
     }

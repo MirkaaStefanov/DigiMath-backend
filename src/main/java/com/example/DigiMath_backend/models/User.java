@@ -16,10 +16,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -62,6 +64,12 @@ public class User implements UserDetails {
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;
 
+    private int currentStreak = 0;
+
+    private int longestStreak = 0;
+
+    @Column(name = "date_last_entered")
+    private LocalDate dateLastEntered;
 
 
     @Override

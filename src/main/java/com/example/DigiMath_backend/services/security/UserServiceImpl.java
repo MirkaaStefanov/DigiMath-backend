@@ -16,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -88,6 +89,39 @@ public class UserServiceImpl implements UserServiceAuthentication {
 
         user.setDeleted(true);
         userRepository.save(user);
+    }
+
+    @Override
+    public void updateStreak(User user) {
+        LocalDate today = LocalDate.now();
+
+        if (user.getDateLastEntered() == null) {
+            // First entry
+            user.setCurrentStreak(1);
+        } else {
+            LocalDate lastEntered = user.getDateLastEntered();
+
+            if (lastEntered.equals(today)) {
+                // Already updated today
+                return;
+            } else if (lastEntered.plusDays(1).equals(today)) {
+                // Continue streak
+                user.setCurrentStreak(user.getCurrentStreak() + 1);
+            } else {
+                // Reset streak
+                user.setCurrentStreak(1);
+            }
+        }
+
+        // Update longest streak
+        user.setLongestStreak(Math.max(user.getLongestStreak(), user.getCurrentStreak()));
+
+        // Update last entered date
+        user.setDateLastEntered(today);
+
+        // Save user
+        userRepository.save(user);
+
     }
 
     private User findById(Long id) {

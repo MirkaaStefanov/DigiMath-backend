@@ -17,4 +17,6 @@ public interface UserServiceAuthentication {
     AdminUserDTO updateUser(Long id, AdminUserDTO userDTO, PublicUserDTO currentUser);
 
     void deleteUserById(Long id, PublicUserDTO currentUser);
+
+     void updateStreak(User user);
 }

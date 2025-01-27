@@ -113,6 +113,7 @@ public class UserService {
         User user1 = modelMapper.map(user, User.class);
         user1.setPassword(encodedPassword);
         user1.setUsernameField(user.getUsername());
+
         userRepository.save(user1);
         return modelMapper.map(user1, UserDTO.class);
     }

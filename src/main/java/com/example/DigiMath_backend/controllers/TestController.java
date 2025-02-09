@@ -7,14 +7,21 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/test")
 @AllArgsConstructor
 public class TestController {
     private final TestService testService;
+    @GetMapping
+    public ResponseEntity<List<TestDTO>>showAllTests(){
+        return ResponseEntity.ok(testService.findAll());
+    }
 
     @PostMapping("/create")
     public ResponseEntity<TestDTO> createGame(@Valid @RequestBody TestDTO test, @RequestHeader("Authorization") String auth) {
         return ResponseEntity.ok(testService.createTest(test));
     }
+
 }

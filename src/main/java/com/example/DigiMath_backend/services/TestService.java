@@ -23,13 +23,13 @@ public class TestService {
     private final TestRepository testRepository;
     private final ModelMapper modelMapper;
 
-    private TestDTO createTest(TestDTO testDTO) {
+    public TestDTO createTest(TestDTO testDTO) {
         Test test = modelMapper.map(testDTO, Test.class);
         testRepository.save(test);
         return testDTO;
     }
 
-    private List<TestDTO> findAll(){
+    public List<TestDTO> findAll(){
         List<Test> allTests = testRepository.findAll();
         return allTests.stream()
                 .map(test -> modelMapper.map(test, TestDTO.class))

@@ -14,8 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class TestController {
     private final TestService testService;
-    @GetMapping
-    public ResponseEntity<List<TestDTO>>showAllTests(){
+    @GetMapping("/all")
+    public ResponseEntity<List<TestDTO>>showAllTests( @RequestHeader("Authorization") String auth){
         return ResponseEntity.ok(testService.findAll());
     }
 

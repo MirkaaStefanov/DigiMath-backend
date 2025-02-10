@@ -63,8 +63,8 @@ public class QuestionService {
         return questionRepository.findById(id)
                 .map(question -> {
                     // Fetch the associated Test
-                    Test test = testRepository.findById(updatedQuestionDTO.getTest())
-                            .orElseThrow(() -> new RuntimeException("Test not found with id: " + updatedQuestionDTO.getTest()));
+                    Test test = testRepository.findById(updatedQuestionDTO.getTest().getId())
+                            .orElseThrow(() -> new RuntimeException("Test not found with id: " + updatedQuestionDTO.getTest().getId()));
 
                     // Update the Question fields
                     modelMapper.map(updatedQuestionDTO, question);

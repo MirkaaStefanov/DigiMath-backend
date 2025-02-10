@@ -36,7 +36,7 @@ public class AnswerService {
 
     public AnswerDTO createAnswer(AnswerDTO answerDTO) {
         Answer answer = modelMapper.map(answerDTO, Answer.class);
-        Question question = questionRepository.findById(answerDTO.getQuestion())
+        Question question = questionRepository.findById(answerDTO.getQuestion().getId())
                 .orElseThrow(() -> new RuntimeException("Question not found with id: " + answerDTO.getQuestion()));
 
         answer.setQuestion(question);
@@ -68,8 +68,8 @@ public class AnswerService {
         return answerRepository.findById(id)
                 .map(answer -> {
                     // Fetch the associated Question
-                    Question question = questionRepository.findById(updatedAnswerDTO.getQuestion())
-                            .orElseThrow(() -> new RuntimeException("Question not found with id: " + updatedAnswerDTO.getQuestion()));
+                    Question question = questionRepository.findById(updatedAnswerDTO.getQuestion().getId())
+                            .orElseThrow(() -> new RuntimeException("Question not found with id: " + updatedAnswerDTO.getQuestion().getId()));
 
                     // Update the Answer fields
                     modelMapper.map(updatedAnswerDTO, answer);

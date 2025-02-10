@@ -21,5 +21,5 @@ public class AnswerDTO {
 
     private String text;
 
-    private boolean isCorrect;
+    private Boolean isCorrect;
 }

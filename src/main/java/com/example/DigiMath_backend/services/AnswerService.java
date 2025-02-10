@@ -23,21 +23,24 @@ public class AnswerService {
     private final QuestionRepository questionRepository;
     private final ModelMapper modelMapper;
 
+    public List<Answer> createAnswersInQuestion(List<AnswerDTO> answerDTOS, Question question){
+
+        List<Answer> answers = answerDTOS.stream().map(value -> modelMapper.map(value, Answer.class)).collect(Collectors.toList());;
+
+        for (Answer answer : answers){
+            answer.setQuestion(question);
+        }
+
+        return answerRepository.saveAll(answers);
+    }
+
     public AnswerDTO createAnswer(AnswerDTO answerDTO) {
-        // Map DTO to Entity
         Answer answer = modelMapper.map(answerDTO, Answer.class);
+        Question question = questionRepository.findById(answerDTO.getQuestion())
+                .orElseThrow(() -> new RuntimeException("Question not found with id: " + answerDTO.getQuestion()));
 
-        // Fetch the associated Question
-        Question question = questionRepository.findById(answerDTO.getQuestion().getId())
-                .orElseThrow(() -> new RuntimeException("Question not found with id: " + answerDTO.getQuestion().getId()));
-
-        // Set the Question in the Answer
         answer.setQuestion(question);
-
-        // Save the Answer
         Answer savedAnswer = answerRepository.save(answer);
-
-        // Add the Answer to the Question's list of answers
         question.getAnswers().add(savedAnswer);
         questionRepository.save(question);
 
@@ -65,8 +68,8 @@ public class AnswerService {
         return answerRepository.findById(id)
                 .map(answer -> {
                     // Fetch the associated Question
-                    Question question = questionRepository.findById(updatedAnswerDTO.getQuestion().getId())
-                            .orElseThrow(() -> new RuntimeException("Question not found with id: " + updatedAnswerDTO.getQuestion().getId()));
+                    Question question = questionRepository.findById(updatedAnswerDTO.getQuestion())
+                            .orElseThrow(() -> new RuntimeException("Question not found with id: " + updatedAnswerDTO.getQuestion()));
 
                     // Update the Answer fields
                     modelMapper.map(updatedAnswerDTO, answer);

@@ -1,6 +1,7 @@
 package com.example.DigiMath_backend.services;
 
 import com.example.DigiMath_backend.dtos.QuestionDTO;
+import com.example.DigiMath_backend.models.Answer;
 import com.example.DigiMath_backend.models.Question;
 import com.example.DigiMath_backend.models.Test;
 import com.example.DigiMath_backend.repositories.QuestionRepository;
@@ -21,13 +22,14 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
     private final TestRepository testRepository;
+    private final AnswerService answerService;
     private final ModelMapper modelMapper;
 
-    public QuestionDTO createQuestion(QuestionDTO questionDTO) {
+    public QuestionDTO createQuestion(QuestionDTO questionDTO,Long testId) {
         Question question = modelMapper.map(questionDTO, Question.class);
 
-        Test test = testRepository.findById(questionDTO.getTest().getId())
-                .orElseThrow(() -> new RuntimeException("Test not found with id: " + questionDTO.getTest().getId()));
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new RuntimeException("Test not found with id: " + questionDTO.getTest()));
 
         question.setTest(test);
 
@@ -35,6 +37,11 @@ public class QuestionService {
 
         test.getQuestions().add(savedQuestion);
         testRepository.save(test);
+
+        List<Answer> answers = answerService.createAnswersInQuestion(questionDTO.getAnswers(),savedQuestion);
+        savedQuestion.setAnswers(answers);
+
+        questionRepository.save(savedQuestion);
 
         return modelMapper.map(savedQuestion, QuestionDTO.class);
     }
@@ -56,8 +63,8 @@ public class QuestionService {
         return questionRepository.findById(id)
                 .map(question -> {
                     // Fetch the associated Test
-                    Test test = testRepository.findById(updatedQuestionDTO.getTest().getId())
-                            .orElseThrow(() -> new RuntimeException("Test not found with id: " + updatedQuestionDTO.getTest().getId()));
+                    Test test = testRepository.findById(updatedQuestionDTO.getTest())
+                            .orElseThrow(() -> new RuntimeException("Test not found with id: " + updatedQuestionDTO.getTest()));
 
                     // Update the Question fields
                     modelMapper.map(updatedQuestionDTO, question);

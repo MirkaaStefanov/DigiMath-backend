@@ -1,6 +1,10 @@
 package com.example.DigiMath_backend.services;
 
+import com.example.DigiMath_backend.dtos.AnswerDTO;
+import com.example.DigiMath_backend.dtos.QuestionDTO;
 import com.example.DigiMath_backend.dtos.TestDTO;
+import com.example.DigiMath_backend.models.Answer;
+import com.example.DigiMath_backend.models.Question;
 import com.example.DigiMath_backend.models.Test;
 import com.example.DigiMath_backend.repositories.TestRepository;
 import com.example.DigiMath_backend.repositories.UserRepository;
@@ -8,9 +12,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,17 +31,21 @@ public class TestService {
     private final TestRepository testRepository;
     private final ModelMapper modelMapper;
 
+
     public TestDTO createTest(TestDTO testDTO) {
         Test test = modelMapper.map(testDTO, Test.class);
         testRepository.save(test);
         return testDTO;
     }
 
-    public List<TestDTO> findAll(){
+    public List<TestDTO> findAll() {
         List<Test> allTests = testRepository.findAll();
-        return allTests.stream()
-                .map(test -> modelMapper.map(test, TestDTO.class))
+
+        List<TestDTO> testDTOS = allTests.stream()
+                .map(test -> modelMapper.map(test, TestDTO.class)) // Map each User to UserDTO
                 .collect(Collectors.toList());
+
+        return testDTOS;
     }
 
     public TestDTO getTestById(Long id) {

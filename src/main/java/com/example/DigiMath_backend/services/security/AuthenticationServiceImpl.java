@@ -6,26 +6,36 @@ import com.example.DigiMath_backend.dtos.auth.PublicUserDTO;
 import com.example.DigiMath_backend.dtos.auth.RefreshTokenBodyDTO;
 import com.example.DigiMath_backend.dtos.auth.RegisterRequest;
 import com.example.DigiMath_backend.enums.TokenType;
+import com.example.DigiMath_backend.exeptions.EmailNotVerified;
 import com.example.DigiMath_backend.exeptions.InvalidTokenException;
 import com.example.DigiMath_backend.exeptions.UserLoginException;
 import com.example.DigiMath_backend.models.Token;
 import com.example.DigiMath_backend.models.User;
+import com.example.DigiMath_backend.models.VerificationToken;
+import com.example.DigiMath_backend.repositories.UserRepository;
+import com.example.DigiMath_backend.repositories.VerificationTokenRepository;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserServiceAuthentication userService;
+    private final VerificationTokenRepository verificationTokenRepository;
+    private final UserRepository userRepository;
     private final TokenService tokenService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
     @Override
@@ -121,6 +131,40 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    /**
+     * Resets the password for a user based on the provided token and new password.
+     */
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
+        if (verificationToken == null) {
+            throw new InvalidTokenException();
+        }
+
+
+        User user = verificationToken.getUser();
+        if (user == null) {
+            throw new InvalidTokenException();
+        }
+
+        verificationToken.setCreatedAt(LocalDateTime.now());
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepository.save(user);
+        verificationTokenRepository.delete(verificationToken);
+    }
+
+    @Override
+    public User forgotPassword(String email) {
+        User user = userService.findByEmail(email);
+
+        if (!user.isEnabled()) {
+            throw new EmailNotVerified();
+        }
+
+        return user;
     }
 
 }

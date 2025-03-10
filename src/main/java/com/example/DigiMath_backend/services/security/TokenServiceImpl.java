@@ -4,7 +4,9 @@ package com.example.DigiMath_backend.services.security;
 import com.example.DigiMath_backend.enums.TokenType;
 import com.example.DigiMath_backend.models.Token;
 import com.example.DigiMath_backend.models.User;
+import com.example.DigiMath_backend.models.VerificationToken;
 import com.example.DigiMath_backend.repositories.TokenRepository;
+import com.example.DigiMath_backend.repositories.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.List;
 @Service
 public class TokenServiceImpl implements TokenService {
     private final TokenRepository tokenRepository;
+    private final VerificationTokenRepository verificationTokenRepository;
 
     @Override
     public Token findByToken(String jwt) {
@@ -63,4 +66,18 @@ public class TokenServiceImpl implements TokenService {
         revokeAllUserTokens(storedToken.getUser());
         SecurityContextHolder.clearContext();
     }
+
+    @Override
+    @Transactional
+    public void createVerificationToken(User user, String token) {
+        clearVerificationTokensByUser(user);
+        VerificationToken myToken = new VerificationToken(token, user);
+        verificationTokenRepository.save(myToken);
+    }
+
+    @Override
+    public void clearVerificationTokensByUser(User user) {
+        verificationTokenRepository.deleteAllByUser(user);
+    }
+
 }

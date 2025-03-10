@@ -21,4 +21,8 @@ public interface TokenService {
     void revokeAllUserTokens(User user);
 
     void logoutToken(String jwt);
+
+    void createVerificationToken(User user, String token);
+
+    void clearVerificationTokensByUser(User user);
 }

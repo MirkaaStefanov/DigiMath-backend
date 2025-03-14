@@ -32,6 +32,4 @@ public class QuestionDTO {
 
     private QuestionType questionType;
 
-    private List<AnswerDTO> answers;
-
 }

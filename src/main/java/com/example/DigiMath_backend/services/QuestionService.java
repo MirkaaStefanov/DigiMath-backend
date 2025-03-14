@@ -9,6 +9,7 @@ import com.example.DigiMath_backend.repositories.TestRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,74 +26,13 @@ public class QuestionService {
     private final AnswerService answerService;
     private final ModelMapper modelMapper;
 
-    public QuestionDTO createQuestion(QuestionDTO questionDTO,Long testId) {
+    public QuestionDTO findById(Long id) throws ChangeSetPersister.NotFoundException {
+        Question question = questionRepository.findById(id).orElseThrow(ChangeSetPersister.NotFoundException::new);
+        return modelMapper.map(question, QuestionDTO.class);
+    }
+
+    public QuestionDTO save(QuestionDTO questionDTO) {
         Question question = modelMapper.map(questionDTO, Question.class);
-
-        Test test = testRepository.findById(testId)
-                .orElseThrow(() -> new RuntimeException("Test not found with id: " + questionDTO.getTest()));
-
-        question.setTest(test);
-
-        Question savedQuestion = questionRepository.save(question);
-
-        test.getQuestions().add(savedQuestion);
-        testRepository.save(test);
-
-        List<Answer> answers = answerService.createAnswersInQuestion(questionDTO.getAnswers(),savedQuestion);
-        savedQuestion.setAnswers(answers);
-
-        questionRepository.save(savedQuestion);
-
-        return modelMapper.map(savedQuestion, QuestionDTO.class);
-    }
-
-    public QuestionDTO getQuestionById(Long id) {
-        Optional<Question> question = questionRepository.findById(id);
-        return question.map(value -> modelMapper.map(value, QuestionDTO.class))
-                .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
-    }
-
-    public List<QuestionDTO> getAllQuestions() {
-        List<Question> questions = questionRepository.findAll();
-        return questions.stream()
-                .map(question -> modelMapper.map(question, QuestionDTO.class))
-                .collect(Collectors.toList());
-    }
-
-    public QuestionDTO updateQuestion(Long id, QuestionDTO updatedQuestionDTO) {
-        return questionRepository.findById(id)
-                .map(question -> {
-                    // Fetch the associated Test
-                    Test test = testRepository.findById(updatedQuestionDTO.getTest().getId())
-                            .orElseThrow(() -> new RuntimeException("Test not found with id: " + updatedQuestionDTO.getTest().getId()));
-
-                    // Update the Question fields
-                    modelMapper.map(updatedQuestionDTO, question);
-                    question.setTest(test);
-
-                    // Save the updated Question
-                    Question savedQuestion = questionRepository.save(question);
-
-                    // Ensure the Question is in the Test's list of questions
-                    if (!test.getQuestions().contains(savedQuestion)) {
-                        test.getQuestions().add(savedQuestion);
-                        testRepository.save(test);
-                    }
-
-                    // Map the saved Question back to DTO and return
-                    return modelMapper.map(savedQuestion, QuestionDTO.class);
-                })
-                .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
-    }
-
-    public void deleteQuestion(Long id) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
-
-        Test test = question.getTest();
-        test.getQuestions().remove(question);
-        testRepository.save(test);
-
-        questionRepository.delete(question);
+        return modelMapper.map(questionRepository.save(question), QuestionDTO.class);
     }
 }

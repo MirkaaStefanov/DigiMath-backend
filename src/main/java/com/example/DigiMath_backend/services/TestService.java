@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,8 +35,8 @@ public class TestService {
 
     public TestDTO createTest(TestDTO testDTO) {
         Test test = modelMapper.map(testDTO, Test.class);
-        testRepository.save(test);
-        return testDTO;
+        return modelMapper.map(testRepository.save(test), TestDTO.class);
+
     }
 
     public List<TestDTO> findAll() {
@@ -48,10 +49,9 @@ public class TestService {
         return testDTOS;
     }
 
-    public TestDTO getTestById(Long id) {
-        Optional<Test> test = testRepository.findById(id);
-        return test.map(value -> modelMapper.map(value, TestDTO.class))
-                .orElseThrow(() -> new RuntimeException("Test not found with id: " + id));
+    public TestDTO getTestById(Long id) throws ChangeSetPersister.NotFoundException {
+        Test test = testRepository.findById(id).orElseThrow(ChangeSetPersister.NotFoundException::new);
+        return modelMapper.map(test, TestDTO.class);
     }
 
     public TestDTO updateTest(Long id, TestDTO updatedTestDTO) {

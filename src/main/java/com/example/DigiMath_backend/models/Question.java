@@ -40,17 +40,12 @@ public class Question {
 
     @ManyToOne
     @JoinColumn(name = "test_id")
-    @JsonBackReference
     private Test test;
 
     private String text;
 
     @Enumerated(EnumType.STRING)
     private QuestionType questionType;
-
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<Answer> answers;
 
 
 }

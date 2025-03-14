@@ -34,5 +34,5 @@ public class Answer {
 
     private String text;
 
-    private Boolean isCorrect;
+    private boolean isCorrect;
 }

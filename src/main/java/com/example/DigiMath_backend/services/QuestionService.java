@@ -9,6 +9,7 @@ import com.example.DigiMath_backend.repositories.TestRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,5 +26,13 @@ public class QuestionService {
     private final AnswerService answerService;
     private final ModelMapper modelMapper;
 
+    public QuestionDTO findById(Long id) throws ChangeSetPersister.NotFoundException {
+        Question question = questionRepository.findById(id).orElseThrow(ChangeSetPersister.NotFoundException::new);
+        return modelMapper.map(question, QuestionDTO.class);
+    }
 
+    public QuestionDTO save(QuestionDTO questionDTO) {
+        Question question = modelMapper.map(questionDTO, Question.class);
+        return modelMapper.map(questionRepository.save(question), QuestionDTO.class);
+    }
 }

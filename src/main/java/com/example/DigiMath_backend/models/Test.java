@@ -32,10 +32,4 @@ public class Test {
 
     private String title;
 
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<Question> questions;
-
-
-
 }

@@ -19,8 +19,5 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
-    @PostMapping("/create")
-    public ResponseEntity<QuestionDTO> create(@RequestBody QuestionDTO questionDTO, @RequestParam Long testId, @RequestHeader("Authorization") String auth){
-        return ResponseEntity.ok(questionService.createQuestion(questionDTO, testId));
-    }
+
 }

@@ -51,7 +51,7 @@ public class PasswordResetListener implements ApplicationListener<OnPasswordRese
     @NotNull
     private String getEmailMessage(String token, User user) {
         //Constructs the email message for the password reset request.
-        String confirmationUrl = frontendConfig.getForgottenPasswordUrl() + "?token=" + token;
+        String confirmationUrl = frontendConfig.getForgottenPasswordUrl() + "/forgotten-password?token=" + token;
 
         return "Dear " + user.getUsername() + ",\n\n"
                 + "A password reset request has been initiated for your account.\n"

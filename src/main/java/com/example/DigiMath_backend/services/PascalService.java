@@ -90,6 +90,8 @@ public class PascalService {
                 totalResult += termValue;
             }
             System.out.println("Result: " + totalResult);
+            finalResult += totalResult;
+            return finalResult;
         } else {
             StringBuilder result = new StringBuilder();
             for (int i = 0; i < lastLine.size(); i++) {
